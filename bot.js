@@ -62,13 +62,7 @@ function createBot(token, webAppUrl) {
     if (!webAppUrl) return ctx.reply(text, Markup.removeKeyboard());
     await ctx.reply(text, Markup.removeKeyboard());
     await ctx.reply('👇', appKeyboard(id));
-    // Chap pastdagi "menyu" tugmasini ham ilovaga ulaymiz
-    await ctx.telegram
-      .setChatMenuButton({
-        chatId: id,
-        menuButton: { type: 'web_app', text: t(id).menuButton, web_app: { url: webAppUrl } },
-      })
-      .catch(() => {});
+    // Chap pastdagi "Ilova" tugmasi index.js da hammaga bir marta o'rnatiladi
   }
 
   // ---------- /start ----------

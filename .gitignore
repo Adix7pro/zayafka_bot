@@ -1,0 +1,12 @@
+node_modules/
+
+# Maxfiy sozlamalar — hech qachon GitHub'ga yuklanmasin!
+.env
+
+# Foydalanuvchilar ma'lumotlari (telefon raqamlar) — faqat serverda turadi
+data/
+*.tmp
+
+# Loglar
+logs/
+*.log

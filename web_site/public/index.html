@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ro'yxatdan o'tish</title>
+  <!-- Telegram Mini App kutubxonasi (oddiy brauzerda hech narsaga xalaqit bermaydi) -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #f3f5f9;
+      --card: #ffffff;
+      --text: #1c2230;
+      --muted: #6b7385;
+      --border: #dde2ec;
+      --accent: #2a8bf2;
+      --accent-hover: #1f78d6;
+      --accent-text: #ffffff;
+      --error: #d93b3b;
+      --success: #1f9d55;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #11151c;
+        --card: #1a2029;
+        --text: #e8ecf3;
+        --muted: #98a1b3;
+        --border: #2c3442;
+        --accent: #4a9ff5;
+        --accent-hover: #6cb2f7;
+        --error: #f06a6a;
+        --success: #4cc782;
+      }
+    }
+    /* Telegram ichida — Telegram mavzusi ranglari (telegram-web-app.js o'zi --tg-theme-* larni qo'yadi) */
+    body.tg {
+      --bg: var(--tg-theme-secondary-bg-color, #f3f5f9);
+      --card: var(--tg-theme-bg-color, #ffffff);
+      --text: var(--tg-theme-text-color, #1c2230);
+      --muted: var(--tg-theme-hint-color, #6b7385);
+      --border: var(--tg-theme-section-separator-color, #dde2ec);
+      --accent: var(--tg-theme-button-color, #2a8bf2);
+      --accent-hover: var(--tg-theme-button-color, #2a8bf2);
+      --accent-text: var(--tg-theme-button-text-color, #ffffff);
+      --error: var(--tg-theme-destructive-text-color, #d93b3b);
+      align-items: flex-start;
+    }
+    body.tg .card { border: none; margin-top: 8px; }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    .card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+    }
+    h1 { font-size: 22px; margin: 0 0 6px; }
+    p.sub { color: var(--muted); margin: 0 0 22px; font-size: 15px; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .hidden { display: none !important; }
+
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      font-size: 16px;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .lang-btn:hover, .lang-btn.suggested { border-color: var(--accent); }
+    .lang-btn .flag { font-size: 22px; }
+
+    label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 6px; }
+    input[type="tel"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 17px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text);
+      outline: none;
+    }
+    input[type="tel"]:focus { border-color: var(--accent); }
+    .error { color: var(--error); font-size: 14px; min-height: 20px; margin: 6px 0 10px; }
+
+    .primary {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: var(--accent);
+      color: var(--accent-text);
+      cursor: pointer;
+    }
+    .primary:hover { background: var(--accent-hover); }
+    .primary:disabled { opacity: .6; cursor: default; }
+    .link {
+      display: block;
+      margin: 14px auto 0;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .done-icon { font-size: 48px; color: var(--success); margin-bottom: 8px; }
+    .loading { color: var(--muted); text-align: center; padding: 20px 0; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <!-- Yuklanmoqda (faqat Telegram ichida, ma'lumot serverdan kelguncha) -->
+    <section class="step" id="step-loading">
+      <div class="loading">⏳</div>
+    </section>
+
+    <!-- 1-qadam: til tanlash -->
+    <section class="step" id="step-lang">
+      <h1>🌐 Tilni tanlang</h1>
+      <p class="sub">Выберите язык / Choose a language</p>
+      <button class="lang-btn" data-lang="uz"><span class="flag">🇺🇿</span> O‘zbekcha</button>
+      <button class="lang-btn" data-lang="ru"><span class="flag">🇷🇺</span> Русский</button>
+      <button class="lang-btn" data-lang="en"><span class="flag">🇬🇧</span> English</button>
+    </section>
+
+    <!-- 2-qadam: telefon raqam -->
+    <section class="step" id="step-phone">
+      <h1 data-t="phoneTitle"></h1>
+      <p class="sub" data-t="phoneSub"></p>
+
+      <!-- Oddiy sayt: raqamni qo'lda yozish -->
+      <form id="phone-form" novalidate>
+        <label for="phone" data-t="phoneLabel"></label>
+        <input type="tel" id="phone" autocomplete="tel" placeholder="+998 90 123 45 67" value="+998 " />
+        <div class="error" id="error"></div>
+        <button type="submit" class="primary" id="submit" data-t="submit"></button>
+      </form>
+
+      <!-- Telegram: raqamni bir bosishda ulashish -->
+      <div id="tg-phone" class="hidden">
+        <button class="primary" id="share-contact" data-t="shareContact"></button>
+        <div class="error" id="tg-error"></div>
+      </div>
+
+      <button class="link" id="change-lang" data-t="changeLang"></button>
+    </section>
+
+    <!-- 3-qadam: tayyor -->
+    <section class="step" id="step-done">
+      <div class="done-icon">✓</div>
+      <h1 id="done-title"></h1>
+      <p class="sub" id="done-text"></p>
+      <button class="link" id="done-change-lang" data-t="changeLang"></button>
+    </section>
+  </main>
+
+  <script>
+    const texts = {
+      uz: {
+        phoneTitle: 'Telefon raqamingiz',
+        phoneSub: 'Ro‘yxatdan o‘tish uchun raqamingizni kiriting',
+        phoneLabel: 'Telefon raqam',
+        submit: 'Yuborish',
+        shareContact: '📱 Raqamni ulashish',
+        changeLang: '← Tilni o‘zgartirish',
+        invalid: 'Raqam noto‘g‘ri kiritildi',
+        serverError: 'Xatolik yuz berdi, qayta urinib ko‘ring',
+        declined: 'Davom etish uchun raqamingizni ulashing',
+        doneTitle: 'Rahmat!',
+        welcome: (n) => `Xush kelibsiz, ${n}!`,
+        saved: (p) => `Raqamingiz saqlandi: ${p}`,
+      },
+      ru: {
+        phoneTitle: 'Ваш номер телефона',
+        phoneSub: 'Введите номер для регистрации',
+        phoneLabel: 'Номер телефона',
+        submit: 'Отправить',
+        shareContact: '📱 Поделиться номером',
+        changeLang: '← Сменить язык',
+        invalid: 'Неверный номер телефона',
+        serverError: 'Произошла ошибка, попробуйте ещё раз',
+        declined: 'Чтобы продолжить, поделитесь номером',
+        doneTitle: 'Спасибо!',
+        welcome: (n) => `Добро пожаловать, ${n}!`,
+        saved: (p) => `Ваш номер сохранён: ${p}`,
+      },
+      en: {
+        phoneTitle: 'Your phone number',
+        phoneSub: 'Enter your number to register',
+        phoneLabel: 'Phone number',
+        submit: 'Submit',
+        shareContact: '📱 Share phone number',
+        changeLang: '← Change language',
+        invalid: 'Invalid phone number',
+        serverError: 'Something went wrong, please try again',
+        declined: 'Please share your number to continue',
+        doneTitle: 'Thank you!',
+        welcome: (n) => `Welcome, ${n}!`,
+        saved: (p) => `Your number has been saved: ${p}`,
+      },
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const tg = window.Telegram?.WebApp;
+    const inTelegram = Boolean(tg?.initData); // Telegram ichida ochilganmi?
+
+    let lang = null;
+    let phone = null;
+
+    function showStep(id) {
+      document.querySelectorAll('.step').forEach((s) => s.classList.toggle('active', s.id === id));
+    }
+
+    function applyLang() {
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-t]').forEach((el) => {
+        el.textContent = texts[lang][el.dataset.t];
+      });
+    }
+
+    function showDone(isReturning) {
+      const t = texts[lang];
+      const name = tg?.initDataUnsafe?.user?.first_name;
+      $('done-title').textContent = isReturning && name ? t.welcome(name) : t.doneTitle;
+      $('done-text').textContent = t.saved(phone);
+      showStep('step-done');
+    }
+
+    function showPhoneStep() {
+      $('error').textContent = '';
+      $('tg-error').textContent = '';
+      showStep('step-phone');
+      if (!inTelegram) focusPhoneEnd();
+    }
+
+    // Kursorni doim raqam oxiriga qo'yamiz ("+998 " dan keyin)
+    function focusPhoneEnd() {
+      const input = $('phone');
+      input.focus();
+      const end = input.value.length;
+      input.setSelectionRange(end, end);
+    }
+
+    async function api(url, body) {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(inTelegram ? { initData: tg.initData, ...body } : body),
+      });
+      return res.json();
+    }
+
+    async function chooseLang(l) {
+      lang = l;
+      applyLang();
+
+      if (inTelegram) {
+        tg.HapticFeedback?.selectionChanged();
+        api('/api/tg/lang', { lang }).catch(() => {});
+      } else {
+        try { localStorage.setItem('lang', l); } catch {}
+      }
+
+      if (phone) showDone(false);
+      else showPhoneStep();
+    }
+
+    document.querySelectorAll('.lang-btn').forEach((btn) =>
+      btn.addEventListener('click', () => chooseLang(btn.dataset.lang))
+    );
+    $('change-lang').addEventListener('click', () => showStep('step-lang'));
+    $('done-change-lang').addEventListener('click', () => showStep('step-lang'));
+
+    // ================= Oddiy sayt =================
+    // Faqat raqam va bo'sh joyga ruxsat, + faqat boshida
+    $('phone').addEventListener('input', (e) => {
+      const v = e.target.value;
+      e.target.value = (v.trim().startsWith('+') ? '+' : '') + v.replace(/[^\d\s]/g, '').trimStart();
+      $('error').textContent = '';
+    });
+
+    $('phone-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const t = texts[lang];
+      const digits = $('phone').value.replace(/\D/g, '');
+
+      if (digits.length < 9 || digits.length > 15) {
+        $('error').textContent = t.invalid;
+        return;
+      }
+
+      $('submit').disabled = true;
+      try {
+        const data = await api('/api/register', { lang, phone: $('phone').value });
+        if (!data.ok) {
+          $('error').textContent = data.error === 'invalid_phone' ? t.invalid : t.serverError;
+          return;
+        }
+        phone = data.phone;
+        showDone(false);
+      } catch {
+        $('error').textContent = t.serverError;
+      } finally {
+        $('submit').disabled = false;
+      }
+    });
+
+    // ================= Telegram Mini App =================
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    $('share-contact').addEventListener('click', () => {
+      const t = texts[lang];
+      $('tg-error').textContent = '';
+
+      tg.requestContact(async (shared, result) => {
+        if (!shared) {
+          $('tg-error').textContent = t.declined;
+          return;
+        }
+
+        $('share-contact').disabled = true;
+        try {
+          // Eski Telegram ilovalarida imzolangan javob kelmaydi — bot kontaktni
+          // saqlaguncha bir necha marta tekshirib ko'ramiz
+          for (let i = 0; i < 6; i++) {
+            const data = await api('/api/tg/contact', { response: result?.response });
+            if (data.ok) {
+              phone = data.phone;
+              tg.HapticFeedback?.notificationOccurred('success');
+              showDone(false);
+              return;
+            }
+            if (data.error !== 'not_yet') break;
+            await sleep(1000);
+          }
+          $('tg-error').textContent = t.serverError;
+        } catch {
+          $('tg-error').textContent = t.serverError;
+        } finally {
+          $('share-contact').disabled = false;
+        }
+      });
+    });
+
+    // ================= Boshlash =================
+    async function initTelegram() {
+      document.body.classList.add('tg');
+      $('phone-form').classList.add('hidden');
+      $('tg-phone').classList.remove('hidden');
+      tg.ready();
+      tg.expand();
+      showStep('step-loading');
+
+      // Telegram tilini taklif qilamiz (ramka bilan belgilanadi)
+      const tgLang = tg.initDataUnsafe?.user?.language_code;
+      document.querySelector(`.lang-btn[data-lang="${tgLang}"]`)?.classList.add('suggested');
+
+      try {
+        const me = await api('/api/tg/me', {});
+        if (!me.ok) throw new Error(me.error);
+        phone = me.phone;
+        if (me.lang) {
+          lang = me.lang;
+          applyLang();
+          if (phone) return showDone(true);
+          return showPhoneStep();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      showStep('step-lang');
+    }
+
+    function initWebsite() {
+      try { lang = localStorage.getItem('lang'); } catch {}
+      // Til avval tanlangan bo'lsa, to'g'ridan-to'g'ri raqam qadamiga o'tamiz
+      if (texts[lang]) chooseLang(lang);
+      else showStep('step-lang');
+    }
+
+    if (inTelegram) initTelegram();
+    else initWebsite();
+  </script>
+</body>
+</html>

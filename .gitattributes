@@ -1,0 +1,2 @@
+# Linux skriptlari Windows'da ham LF bilan saqlansin, aks holda serverda ishlamaydi
+*.sh text eol=lf

@@ -22,6 +22,14 @@ if (!BOT_TOKEN) {
   const webAppUrl = WEBAPP_URL?.startsWith('https://') ? WEBAPP_URL : null;
   const bot = createBot(BOT_TOKEN, webAppUrl);
 
+  // "/" bosilganda chiqadigan buyruqlar ro'yxati
+  bot.telegram
+    .setMyCommands([
+      { command: 'start', description: 'Boshlash / Начать / Start' },
+      { command: 'sayt', description: 'Sayt havolasi / Ссылка на сайт / Website' },
+    ])
+    .catch((err) => console.error('Buyruqlar o‘rnatilmadi:', err.message));
+
   // Barcha foydalanuvchilar uchun chap pastdagi "Ilova" menyu tugmasi
   if (webAppUrl) {
     bot.telegram

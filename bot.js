@@ -11,7 +11,8 @@ const texts = {
     notYours: '❗ Iltimos, faqat o‘zingizning raqamingizni tugma orqali yuboring.',
     useButton: '👇 Iltimos, pastdagi tugmani bosing.',
     openApp: '🚀 Ilovani ochish',
-    menuButton: 'Ilova',
+    openSite: '🌐 Saytni brauzerda ochish',
+    siteInfo: (url) => `🌐 Saytimiz: ${url}`,
   },
   ru: {
     askPhone: 'Пожалуйста, отправьте свой номер телефона 👇',
@@ -21,7 +22,8 @@ const texts = {
     notYours: '❗ Пожалуйста, отправьте свой собственный номер через кнопку.',
     useButton: '👇 Пожалуйста, нажмите кнопку ниже.',
     openApp: '🚀 Открыть приложение',
-    menuButton: 'Приложение',
+    openSite: '🌐 Открыть сайт в браузере',
+    siteInfo: (url) => `🌐 Наш сайт: ${url}`,
   },
   en: {
     askPhone: 'Please share your phone number 👇',
@@ -31,7 +33,8 @@ const texts = {
     notYours: '❗ Please share your own number using the button.',
     useButton: '👇 Please press the button below.',
     openApp: '🚀 Open app',
-    menuButton: 'App',
+    openSite: '🌐 Open website in browser',
+    siteInfo: (url) => `🌐 Our website: ${url}`,
   },
 };
 
@@ -52,16 +55,19 @@ function createBot(token, webAppUrl) {
       .resize()
       .oneTime();
 
-  // Web App tugmasi (faqat WEBAPP_URL berilgan bo'lsa)
+  // Ilova (Telegram ichida) va sayt (oddiy brauzerda) tugmalari — faqat WEBAPP_URL berilgan bo'lsa
   const appKeyboard = (userId) =>
-    webAppUrl ? Markup.inlineKeyboard([[Markup.button.webApp(t(userId).openApp, webAppUrl)]]) : undefined;
+    Markup.inlineKeyboard([
+      [Markup.button.webApp(t(userId).openApp, webAppUrl)],
+      [Markup.button.url(t(userId).openSite, webAppUrl)],
+    ]);
 
-  // Ro'yxatdan o'tgach: pastki klaviaturani olib tashlaymiz va ilova tugmasini ko'rsatamiz
+  // Ro'yxatdan o'tgach: pastki klaviaturani olib tashlaymiz va ilova/sayt tugmalarini ko'rsatamiz
   async function sendRegistered(ctx, text) {
     const id = ctx.from.id;
     if (!webAppUrl) return ctx.reply(text, Markup.removeKeyboard());
     await ctx.reply(text, Markup.removeKeyboard());
-    await ctx.reply('👇', appKeyboard(id));
+    await ctx.reply(t(id).siteInfo(webAppUrl), appKeyboard(id));
     // Chap pastdagi "Ilova" tugmasi index.js da hammaga bir marta o'rnatiladi
   }
 
@@ -75,6 +81,13 @@ function createBot(token, webAppUrl) {
     }
 
     await ctx.reply('🌐 Tilni tanlang / Выберите язык / Choose a language:', languageKeyboard);
+  });
+
+  // ---------- /sayt — sayt havolasi va tugmalar (ro'yxatdan o'tmaganlarga ham) ----------
+  bot.command(['sayt', 'site'], async (ctx) => {
+    if (!webAppUrl) return;
+    const id = ctx.from.id;
+    await ctx.reply(t(id).siteInfo(webAppUrl), appKeyboard(id));
   });
 
   // ---------- Til tanlash ----------

@@ -22,6 +22,13 @@ if (!BOT_TOKEN) {
   const webAppUrl = WEBAPP_URL?.startsWith('https://') ? WEBAPP_URL : null;
   const bot = createBot(BOT_TOKEN, webAppUrl);
 
+  // Barcha foydalanuvchilar uchun chap pastdagi "Ilova" menyu tugmasi
+  if (webAppUrl) {
+    bot.telegram
+      .setChatMenuButton({ menuButton: { type: 'web_app', text: 'Ilova', web_app: { url: webAppUrl } } })
+      .catch((err) => console.error('Menyu tugmasi o‘rnatilmadi:', err.message));
+  }
+
   bot.launch(() => console.log('🤖 Bot ishga tushdi')).catch((err) => {
     // Masalan: token noto'g'ri yoki bot boshqa joyda ham ishlayapti (409 Conflict)
     console.error('❌ Bot ishga tushmadi:', err.message);

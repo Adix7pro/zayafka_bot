@@ -27,25 +27,17 @@ data/                 — foydalanuvchilar
 tunnel/               — Cloudflare tunnel kaliti
 ```
 
-## Ubuntu serverga o'rnatish (bir marta)
+## Ubuntu'da ishga tushirish
 
-**1. Serverda** kodni GitHub'dan olish:
+**To'liq qo'llanma: [docs/UBUNTU.md](docs/UBUNTU.md)**
+
+Qisqacha (Ubuntu'da):
 
 ```bash
-sudo mkdir -p /var/www/zayafka_bot && sudo chown $USER:$USER /var/www/zayafka_bot
 git clone https://github.com/Adix7pro/zayafka_bot.git /var/www/zayafka_bot
-```
-
-**2. Kompyuterda** (loyiha papkasida) maxfiy fayllarni serverga nusxalash:
-
-```bash
-scp -r .env data tunnel USER@SERVER_IP:/var/www/zayafka_bot/
-```
-
-**3. Serverda** hammasini sozlash:
-
-```bash
-cd /var/www/zayafka_bot && sudo bash deploy/setup-server.sh
+cd /var/www/zayafka_bot && cp .env.example .env && nano .env
+sudo bash deploy/setup-server.sh
+bash deploy/status.sh
 ```
 
 ## Kodni yangilash

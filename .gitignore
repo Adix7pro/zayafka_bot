@@ -10,3 +10,6 @@ data/
 # Loglar
 logs/
 *.log
+
+# Cloudflare tunnel kaliti — maxfiy
+tunnel/

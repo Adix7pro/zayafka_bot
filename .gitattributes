@@ -1,4 +1,2 @@
 # Linux skriptlari Windows'da ham LF bilan saqlansin, aks holda serverda ishlamaydi
 *.sh text eol=lf
-# PowerShell skriptlari Windows qator oxiri (CRLF) bilan saqlansin
-*.ps1 text eol=crlf

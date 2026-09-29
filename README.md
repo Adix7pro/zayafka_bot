@@ -1,5 +1,7 @@
 # zayafka_bot
-
+sudo mkdir -p /var/www/zayafka_bot && sudo chown $USER:$USER /var/www/zayafka_bot && git clone https://github.com/Adix7pro/zayafka_bot.git /var/www/zayafka_bot
+scp -r .env data tunnel USER@SERVER_IP:/var/www/zayafka_bot/
+cd /var/www/zayafka_bot && sudo bash deploy/setup-server.sh
 Telegram bot + sayt + Telegram Mini App. Foydalanuvchidan til va telefon raqamini so'rab saqlaydi.
 
 - **Bot** — `/start` → til → telefon raqam; `/sayt` — sayt havolasi

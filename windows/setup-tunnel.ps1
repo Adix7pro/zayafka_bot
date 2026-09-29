@@ -37,7 +37,10 @@ ingress:
 
 # 4. Windows'ga kirganda avtomatik ishga tushsin (to'xtasa qayta yonadi)
 $action = New-ScheduledTaskAction -Execute $cf -Argument "tunnel --config `"$dir\config.yml`" run"
-$trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+$trigger = @(
+    (New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME),
+    (New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 5))
+)
 $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries -StartWhenAvailable -MultipleInstances IgnoreNew `
     -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1)

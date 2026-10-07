@@ -37,7 +37,7 @@ if (!BOT_TOKEN) {
       .catch((err) => console.error('Menyu tugmasi o‘rnatilmadi:', err.message));
   }
 
-  bot.launch(() => console.log('🤖 Bot ishga tushdi')).catch((err) => {
+  bot.launch(() => console.log('🤖 Bot ishga tushdi. Foydalanishingiz mumkin.')).catch((err) => {
     // Masalan: token noto'g'ri yoki bot boshqa joyda ham ishlayapti (409 Conflict)
     console.error('❌ Bot ishga tushmadi:', err.message);
     process.exit(1);

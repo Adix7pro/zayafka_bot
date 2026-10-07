@@ -58,3 +58,5 @@ sudo systemctl restart cloudflared
 ```
 
 > ⚠️ Bot bir vaqtda faqat **bitta joyda** ishlashi mumkin — aks holda `409 Conflict` xatosi chiqadi.
+> Everything will be good If you don't update url tables
+
